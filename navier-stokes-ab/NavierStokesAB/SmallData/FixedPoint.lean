@@ -101,7 +101,7 @@ theorem norm_nlK_le (hν : 0 < ν) (hσ : 0 ≤ σ) (k j : Λ) : ‖nlK ν σ h�
   ContinuousLinearMap.opNorm_le_bound₂ _ (by positivity) (norm_nlK_apply_le hν hσ k j)
 
 /-- The nonlinear symbol, packaged for `convCLM`. -/
-noncomputable def nlSymbol (hν : 0 < ν) (hσ : 0 ≤ σ) : Symbol G where
+noncomputable def nlSymbol (hν : 0 < ν) (hσ : 0 ≤ σ) : Symbol G G where
   K := nlK ν σ hν
   C := 1 / (2 * π * ν)
   C_nonneg := by positivity

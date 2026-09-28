@@ -117,7 +117,8 @@ theorem hasFDerivAt_four {c : Λ → E} (hc : RapidDecay c) (x : ℝ³) :
 theorem fderiv_four {c : Λ → E} (hc : RapidDecay c) : fderiv ℝ (four c) = four (dcoef c) :=
   funext fun x => (hasFDerivAt_four hc x).fderiv
 
-theorem four_apply_clm {c : Λ → ℝ³ →L[ℝ] E} (hc : RapidDecay c) (x h : ℝ³) :
+theorem four_apply_clm {M : Type*} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    {c : Λ → M →L[ℝ] E} (hc : RapidDecay c) (x : ℝ³) (h : M) :
     four c x h = four (fun k => c k h) x := by
   have h1 := (ContinuousLinearMap.apply ℝ E h).map_tsum (summable_four hc x)
   simp only [ContinuousLinearMap.apply_apply] at h1

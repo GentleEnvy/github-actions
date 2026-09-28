@@ -111,7 +111,7 @@ theorem lapOp_apply (ν s s' : ℝ) (hν : 0 ≤ ν) (h : s' < s) (w : D) (k : �
     lapOp ν s s' hν h w k = ((((-(ν * lam k)) : ℝ) : ℂ) * wt (s' - s) k) • w k := rfl
 
 /-- The symbol of the nonlinearity from weight `s` to weight `s'`. -/
-noncomputable def nlOpSymbol (s s' : ℝ) (hs : 0 ≤ s) (h : s' < s) : Symbol V where
+noncomputable def nlOpSymbol (s s' : ℝ) (hs : 0 ≤ s) (h : s' < s) : Symbol V V where
   K k j := (wt s' k * wt (-s) j * wt (-s) (k - j)) • nl k
   C := 2 * π * powExpBound 1 (sub_pos.2 h)
   C_nonneg := by have := powExpBound_nonneg 1 (sub_pos.2 h); positivity

@@ -66,16 +66,18 @@ end L1
 
 section ConvOp
 
-variable {G : Type*} [NormedAddCommGroup G] [NormedSpace ℂ G] [CompleteSpace G]
+variable {G F : Type*} [NormedAddCommGroup G] [NormedSpace ℂ G] [CompleteSpace G]
+  [NormedAddCommGroup F] [NormedSpace ℂ F] [CompleteSpace F]
 
-/-- Uniformly bounded bilinear symbols. -/
-structure Symbol (G : Type*) [NormedAddCommGroup G] [NormedSpace ℂ G] where
-  K : Λ → Λ → G →L[ℂ] G →L[ℂ] G
+/-- Uniformly bounded bilinear symbols `G × G → F`. -/
+structure Symbol (G F : Type*) [NormedAddCommGroup G] [NormedSpace ℂ G] [NormedAddCommGroup F]
+    [NormedSpace ℂ F] where
+  K : Λ → Λ → G →L[ℂ] G →L[ℂ] F
   C : ℝ
   C_nonneg : 0 ≤ C
   bound : ∀ k j, ‖K k j‖ ≤ C
 
-variable (S : Symbol G)
+variable (S : Symbol G F)
 
 theorem Symbol.norm_apply_le (k j : Λ) (x y : G) : ‖S.K k j x y‖ ≤ S.C * (‖x‖ * ‖y‖) := by
   calc ‖S.K k j x y‖ ≤ ‖S.K k j x‖ * ‖y‖ := (S.K k j x).le_opNorm y
@@ -84,7 +86,7 @@ theorem Symbol.norm_apply_le (k j : Λ) (x y : G) : ‖S.K k j x y‖ ≤ S.C * 
     _ = S.C * (‖x‖ * ‖y‖) := by ring
 
 /-- The pointwise convolution sum. -/
-noncomputable def convFun (b b' : lp (fun _ : Λ => G) 1) (k : Λ) : G :=
+noncomputable def convFun (b b' : lp (fun _ : Λ => G) 1) (k : Λ) : F :=
   ∑' j, S.K k j (b j) (b' (k - j))
 
 theorem conv_bound_summable (b b' : lp (fun _ : Λ => G) 1) :
@@ -123,7 +125,7 @@ theorem tsum_norm_convFun_le (b b' : lp (fun _ : Λ => G) 1) :
     _ = S.C * (‖b‖ * ‖b'‖) := by rw [tsum_mul_left, (conv_bound_summable b b').2.2]
 
 /-- The convolution as an element of `ℓ¹`. -/
-noncomputable def conv (b b' : lp (fun _ : Λ => G) 1) : lp (fun _ : Λ => G) 1 :=
+noncomputable def conv (b b' : lp (fun _ : Λ => G) 1) : lp (fun _ : Λ => F) 1 :=
   ⟨convFun S b b', memℓp_one_of_summable (convFun_norm_summable S b b')⟩
 
 @[simp] theorem conv_apply (b b' : lp (fun _ : Λ => G) 1) (k : Λ) :
@@ -162,7 +164,7 @@ theorem conv_smul_right (c : ℂ) (b b' : lp (fun _ : Λ => G) 1) :
 
 /-- The convolution as a bounded bilinear map. -/
 noncomputable def convCLM : lp (fun _ : Λ => G) 1 →L[ℂ] lp (fun _ : Λ => G) 1 →L[ℂ]
-    lp (fun _ : Λ => G) 1 :=
+    lp (fun _ : Λ => F) 1 :=
   LinearMap.mkContinuous₂
     (LinearMap.mk₂ ℂ (conv S) (conv_add_left S) (conv_smul_left S) (conv_add_right S)
       (conv_smul_right S))
