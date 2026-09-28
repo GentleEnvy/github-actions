@@ -12,6 +12,9 @@ Velocity Fourier coefficients live in `V = ℂ³`. For a frequency `k`:
 open Real Complex
 open scoped NNReal BoundedContinuousFunction InnerProductSpace
 
+-- Instance search over operator spaces on these concrete spaces is slow.
+set_option synthInstance.maxHeartbeats 200000
+
 namespace NavierStokesAB.SmallData
 
 /-- Fourier coefficients of velocity fields. -/

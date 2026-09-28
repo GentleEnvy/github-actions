@@ -17,6 +17,9 @@ maps the ball of radius `πν/2` into itself and is a `1/2`-contraction there wh
 open Real Complex Metric Set
 open scoped NNReal BoundedContinuousFunction InnerProductSpace
 
+-- Instance search over operator spaces on these concrete spaces is slow.
+set_option synthInstance.maxHeartbeats 200000
+
 namespace NavierStokesAB.SmallData
 
 /-- Time-dependent Fourier coefficients. -/

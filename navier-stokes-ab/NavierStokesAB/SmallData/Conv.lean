@@ -11,6 +11,9 @@ import NavierStokesAB.SmallData.Lattice
 
 open scoped BigOperators
 
+-- Instance search over operator spaces on these concrete spaces is slow.
+set_option synthInstance.maxHeartbeats 200000
+
 namespace NavierStokesAB.SmallData
 
 /-- The shear `(j, l) ↦ (j + l, j)` on `Λ × Λ`. -/

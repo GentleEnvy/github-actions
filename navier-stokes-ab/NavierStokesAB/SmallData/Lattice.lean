@@ -9,6 +9,9 @@ The Fourier modes on `ℝ³/ℤ³` are indexed by `Λ = Fin 3 → ℤ`. We recor
 
 open Real
 
+-- Instance search over operator spaces on these concrete spaces is slow.
+set_option synthInstance.maxHeartbeats 200000
+
 namespace NavierStokesAB.SmallData
 
 /-- Frequencies of `ℝ³/ℤ³`. -/

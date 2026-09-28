@@ -13,6 +13,9 @@ For `μ > 0`:
 open Real MeasureTheory
 open scoped NNReal BoundedContinuousFunction
 
+-- Instance search over operator spaces on these concrete spaces is slow.
+set_option synthInstance.maxHeartbeats 200000
+
 namespace NavierStokesAB.SmallData
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
