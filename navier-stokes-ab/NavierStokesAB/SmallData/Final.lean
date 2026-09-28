@@ -519,4 +519,21 @@ theorem existencePeriodic_of_analytic {ν σ : ℝ} (hν : 0 < ν) (hσ : 0 < σ
     funext fun x => re3_four_smul ε (rapidDecay_of_summable_exp hσ hsum) x
   rwa [this] at hvp
 
+/-- **Large viscosity.** For any analytic divergence-free Hermitian coefficients there is `ν₀`
+such that (B) holds for the datum `Re Σₖ c_k e^{2πi k·x}` at every viscosity `ν ≥ ν₀`. -/
+theorem existencePeriodic_of_large_viscosity {σ : ℝ} (hσ : 0 < σ) (c : Λ → V)
+    (hsum : Summable fun k => Real.exp (σ * kn k) * ‖c k‖)
+    (hdiv : ∀ k, ⟪kC k, c k⟫_ℂ = 0) (hherm : ∀ k, c (-k) = vconj (c k)) :
+    ∃ ν₀ > 0, ∀ ν ≥ ν₀,
+      ∃ v p, NavierStokesExistenceAndSmoothnessPeriodic ν (fun x => re3 (four c x)) 0 v p := by
+  set S := ∑' k, Real.exp (σ * kn k) * ‖c k‖
+  have hS0 : 0 ≤ S := tsum_nonneg fun k => by positivity
+  refine ⟨4 * S / π + 1, by positivity, fun ν hν => ?_⟩
+  have hν0 : 0 < ν := lt_of_lt_of_le (by positivity) hν
+  have hsmall : S ≤ π * ν / 4 := by
+    have h1 : 4 * S / π ≤ ν := by linarith
+    rw [div_le_iff₀ pi_pos] at h1
+    linarith
+  exact (existencePeriodic_of_small hν0 hσ c hsum hsmall hdiv hherm).2
+
 end NavierStokesAB.SmallData
