@@ -1,4 +1,26 @@
-import Mathlib
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+import Mathlib.Analysis.Normed.Ring.InfiniteSum
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Data.Fin.Tuple.Basic
+import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Analysis.Normed.Lp.lpSpace
+import Mathlib.Topology.ContinuousMap.Bounded.Normed
+import Mathlib.Analysis.Calculus.SmoothSeries
+import Mathlib.Analysis.InnerProductSpace.Calculus
+import Mathlib.Analysis.InnerProductSpace.Laplacian
+import Mathlib.Analysis.Calculus.Gradient.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Analysis.Complex.Exponential
+import Mathlib.LinearAlgebra.Trace
+import Mathlib.Analysis.InnerProductSpace.Trace
+import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+import Mathlib.Analysis.Complex.RealDeriv
+import Mathlib.Topology.MetricSpace.Contracting
+import Mathlib.Analysis.InnerProductSpace.Projection.Basic
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+import Mathlib.MeasureTheory.Integral.DominatedConvergence
 
 /-!
 # Frequencies `ℤ³` and exponential weights

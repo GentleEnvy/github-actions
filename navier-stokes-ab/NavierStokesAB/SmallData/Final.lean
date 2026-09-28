@@ -106,7 +106,7 @@ theorem RapidDecay.of_norm_le_pow {E F : Type*} [NormedAddCommGroup E] [NormedAd
 
 theorem RapidDecay.inner {c : Λ → V} (hc : RapidDecay c) (z : V) :
     RapidDecay fun k => ⟪z, c k⟫_ℂ :=
-  hc.of_norm_le (C := ‖z‖) fun k => norm_inner_le_norm _ _
+  hc.of_norm_le (C := ‖z‖) fun _ => norm_inner_le_norm _ _
 
 theorem RapidDecay.lap {c : Λ → V} (hc : RapidDecay c) :
     RapidDecay fun k => (-((4 * π ^ 2 * kn k ^ 2 : ℝ) : ℂ)) • c k :=
@@ -433,5 +433,90 @@ theorem existencePeriodic :
   isOnePeriodic_pressure t _ := h.prs_periodic t
 
 end Small
+
+/-! ### The statement in terms of Fourier coefficients -/
+
+/-- **Small analytic data.** Let `u₀(x) = Re Σₖ c_k e^{2πi k·x}` with divergence-free Hermitian
+coefficients satisfying `Σₖ e^{σ|k|} |c_k| ≤ πν/4` for some `σ > 0`. Then `u₀` is an admissible
+periodic datum, and the unforced Navier–Stokes equations with viscosity `ν > 0` have a global
+smooth periodic solution with this datum, in the exact sense of the Clay/Formal Conjectures
+statement (B). -/
+theorem existencePeriodic_of_small {ν σ : ℝ} (hν : 0 < ν) (hσ : 0 < σ) (c : Λ → V)
+    (hsum : Summable fun k => Real.exp (σ * kn k) * ‖c k‖)
+    (hsmall : ∑' k, Real.exp (σ * kn k) * ‖c k‖ ≤ π * ν / 4)
+    (hdiv : ∀ k, ⟪kC k, c k⟫_ℂ = 0) (hherm : ∀ k, c (-k) = vconj (c k)) :
+    InitialVelocityConditionPeriodic (fun x => re3 (four c x)) ∧
+      ∃ v p, NavierStokesExistenceAndSmoothnessPeriodic ν (fun x => re3 (four c x)) 0 v p := by
+  have hn : ∀ k, ‖wt σ k • c k‖ = Real.exp (σ * kn k) * ‖c k‖ := fun k => by
+    rw [norm_smul, norm_wt]
+  let a : D := ⟨fun k => wt σ k • c k, memℓp_one_of_summable (by simpa only [hn] using hsum)⟩
+  have ha : ∀ k, a k = wt σ k • c k := fun k => rfl
+  have hS : Small ν σ a :=
+    { pos := hν
+      weight := hσ
+      small := by rw [l1_norm_eq]; simpa only [ha, hn] using hsmall
+      div := fun k => by rw [ha, inner_smul_right, hdiv, mul_zero]
+      herm := fun k => by rw [ha, ha, wt, wt, kn_neg, hherm, vconj_ofReal_smul] }
+  have hd : Small.datum σ a = fun x => re3 (four c x) := by
+    funext x
+    rw [Small.datum]
+    congr 2
+    funext k
+    rw [ha, wt_smul_wt_smul, neg_add_cancel]
+    simp [wt]
+  rw [← hd]
+  exact ⟨hS.initialVelocityConditionPeriodic, hS.vel, hS.prs, hS.existencePeriodic⟩
+
+theorem rapidDecay_of_summable_exp {σ : ℝ} (hσ : 0 < σ) {c : Λ → V}
+    (hsum : Summable fun k => Real.exp (σ * kn k) * ‖c k‖) : RapidDecay c := fun m => by
+  obtain ⟨C, hC⟩ := pow_mul_exp_neg_le m hσ
+  refine (hsum.mul_left C).of_nonneg_of_le
+    (fun k => mul_nonneg (pow_nonneg (kn_nonneg k) m) (norm_nonneg _)) fun k => ?_
+  have h1 : Real.exp (-σ * kn k) * Real.exp (σ * kn k) = 1 := by
+    rw [← Real.exp_add]; simp
+  calc kn k ^ m * ‖c k‖
+      = (kn k ^ m * Real.exp (-σ * kn k)) * (Real.exp (σ * kn k) * ‖c k‖) := by
+        linear_combination (-(kn k ^ m * ‖c k‖)) * h1
+    _ ≤ C * (Real.exp (σ * kn k) * ‖c k‖) :=
+        mul_le_mul_of_nonneg_right (hC (kn k) (kn_nonneg k)) (by positivity)
+
+theorem re3_four_smul (ε : ℝ) {c : Λ → V} (hc : RapidDecay c) (x : ℝ³) :
+    re3 (four (fun k => (ε : ℂ) • c k) x) = ε • re3 (four c x) := by
+  have := four_map ((ε : ℂ) • ContinuousLinearMap.id ℂ V) hc x
+  simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply] at this
+  rw [← this]
+  ext i
+  simp
+
+/-- **Every analytic datum, scaled down, has a global solution.** For any divergence-free
+Hermitian coefficients with `Σₖ e^{σ|k|} |c_k| < ∞`, there is `ε₀ > 0` such that for `|ε| ≤ ε₀`
+the unforced problem (B) with datum `ε · Re Σₖ c_k e^{2πi k·x}` has a global smooth solution. -/
+theorem existencePeriodic_of_analytic {ν σ : ℝ} (hν : 0 < ν) (hσ : 0 < σ) (c : Λ → V)
+    (hsum : Summable fun k => Real.exp (σ * kn k) * ‖c k‖)
+    (hdiv : ∀ k, ⟪kC k, c k⟫_ℂ = 0) (hherm : ∀ k, c (-k) = vconj (c k)) :
+    ∃ ε₀ > 0, ∀ ε : ℝ, |ε| ≤ ε₀ →
+      ∃ v p, NavierStokesExistenceAndSmoothnessPeriodic ν (fun x => ε • re3 (four c x)) 0 v p := by
+  set S := ∑' k, Real.exp (σ * kn k) * ‖c k‖ with hSdef
+  have hS0 : 0 ≤ S := tsum_nonneg fun k => by positivity
+  have hpν : 0 < π * ν / 4 := by positivity
+  refine ⟨π * ν / 4 / (S + 1), by positivity, fun ε hε => ?_⟩
+  have hn : ∀ k, Real.exp (σ * kn k) * ‖(ε : ℂ) • c k‖ = |ε| * (Real.exp (σ * kn k) * ‖c k‖) :=
+    fun k => by rw [norm_smul, Complex.norm_real, Real.norm_eq_abs]; ring
+  have hsum' : Summable fun k => Real.exp (σ * kn k) * ‖(ε : ℂ) • c k‖ := by
+    simpa only [hn] using hsum.mul_left |ε|
+  have hsmall' : ∑' k, Real.exp (σ * kn k) * ‖(ε : ℂ) • c k‖ ≤ π * ν / 4 := by
+    simp only [hn]
+    rw [tsum_mul_left, ← hSdef]
+    calc |ε| * S ≤ π * ν / 4 / (S + 1) * S := mul_le_mul_of_nonneg_right hε hS0
+      _ ≤ π * ν / 4 := by
+        rw [div_mul_eq_mul_div, div_le_iff₀ (by linarith)]
+        nlinarith
+  obtain ⟨-, v, p, hvp⟩ := existencePeriodic_of_small hν hσ (fun k => (ε : ℂ) • c k) hsum'
+    hsmall' (fun k => by simp only [inner_smul_right, hdiv, mul_zero])
+    (fun k => by simp only [hherm, vconj_ofReal_smul])
+  refine ⟨v, p, ?_⟩
+  have : (fun x => re3 (four (fun k => (ε : ℂ) • c k) x)) = fun x => ε • re3 (four c x) :=
+    funext fun x => re3_four_smul ε (rapidDecay_of_summable_exp hσ hsum) x
+  rwa [this] at hvp
 
 end NavierStokesAB.SmallData

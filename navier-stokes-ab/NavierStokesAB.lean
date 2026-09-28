@@ -5,3 +5,4 @@ import NavierStokesAB.Beltrami
 import NavierStokesAB.SpecialCases
 import NavierStokesAB.ABC
 import NavierStokesAB.Scaling
+import NavierStokesAB.SmallData.Final
