@@ -37,13 +37,13 @@ theorem forceCondition_zero : ForceCondition (0 : ℝ^n → ℝ → ℝ^n) :=
 theorem forceConditionDecay_zero : ForceConditionDecay (0 : ℝ^n → ℝ → ℝ^n) where
   toForceCondition := forceCondition_zero
   decay m K := ⟨0, fun x t _ => by
-    rw [uncurry_zero, iteratedFDerivWithin_zero_fun, norm_zero, zero_div]⟩
+    rw [uncurry_zero, iteratedFDerivWithin_fun_zero, Pi.zero_apply, norm_zero, zero_div]⟩
 
 theorem forceConditionPeriodic_zero : ForceConditionPeriodic (0 : ℝ^n → ℝ → ℝ^n) where
   toForceCondition := forceCondition_zero
   isOnePeriodic _ _ _ _ := rfl
   decay m K := ⟨0, fun x t _ => by
-    rw [uncurry_zero, iteratedFDerivWithin_zero_fun, norm_zero, zero_div]⟩
+    rw [uncurry_zero, iteratedFDerivWithin_fun_zero, Pi.zero_apply, norm_zero, zero_div]⟩
 
 /-! ### Existence ↔ no breakdown -/
 

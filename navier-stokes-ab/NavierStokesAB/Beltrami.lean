@@ -54,7 +54,7 @@ theorem differentiable (hU : IsBeltrami μ U) : Differentiable ℝ U :=
   hU.smooth.differentiable (by simp)
 
 theorem contDiffAt_two (hU : IsBeltrami μ U) (x : ℝ^n) : ContDiffAt ℝ 2 U x :=
-  hU.smooth.contDiffAt.of_le (by exact_mod_cast le_top)
+  hU.smooth.contDiffAt.of_le (by simp)
 
 theorem initialVelocityCondition (hU : IsBeltrami μ U) : InitialVelocityCondition U :=
   ⟨hU.div_free, hU.smooth⟩
@@ -93,7 +93,7 @@ theorem solution (nu : ℝ) (hU : IsBeltrami μ U) :
     rw [hdt, hconv, hlap, inner_add_left, inner_sub_left, inner_gradient_left, hp.fderiv,
       hU.laplacian_eq x]
     simp only [ContinuousLinearMap.smul_apply, map_smul, real_inner_smul_left,
-      ContinuousLinearMap.comp_apply, innerSL_apply_apply, smul_eq_mul, two_smul, two_nsmul,
+      ContinuousLinearMap.comp_apply, innerSL_apply_apply, smul_eq_mul, two_smul,
       ContinuousLinearMap.add_apply]
     rw [hU.lamb x w]
     ring
@@ -109,7 +109,7 @@ theorem solution (nu : ℝ) (hU : IsBeltrami μ U) :
     have : ContDiff ℝ ∞
         (fun q : ℝ^n × ℝ => -(Real.exp (-(nu * μ) * q.2) ^ 2 / 2) * ‖U q.1‖ ^ 2) :=
       ((((contDiff_const.mul contDiff_snd).exp.pow 2).div_const 2).neg).mul
-        (hU.smooth.comp contDiff_fst).norm_sq
+        (ContDiff.norm_sq ℝ (hU.smooth.comp contDiff_fst))
     exact this.contDiffOn
 
 /-- For a `1`-periodic Beltrami profile the solution is in the class of Clay (B). -/

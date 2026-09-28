@@ -35,7 +35,7 @@ theorem euler_iff_navierStokes_zero (u₀ : ℝ³ → ℝ³) (v : ℝ³ → ℝ 
   have heq : ∀ x t, (derivWithin (v x ·) (Set.Ici 0) t + fderiv ℝ (v · t) x (v x t) =
       -gradient (p · t) x) ↔
       (derivWithin (v x ·) (Set.Ici 0) t + fderiv ℝ (v · t) x (v x t) =
-        (0 : ℝ) • InnerProductSpace.laplacian (v · t) x - gradient (p · t) x +
+        (0 : ℝ) • Laplacian.laplacian (v · t) x - gradient (p · t) x +
           (0 : ℝ³ → ℝ → ℝ³) x t) := by
     intro x t
     simp

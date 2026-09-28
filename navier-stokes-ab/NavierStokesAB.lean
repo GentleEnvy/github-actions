@@ -4,3 +4,4 @@ import NavierStokesAB.Euler
 import NavierStokesAB.Beltrami
 import NavierStokesAB.SpecialCases
 import NavierStokesAB.ABC
+import NavierStokesAB.Scaling

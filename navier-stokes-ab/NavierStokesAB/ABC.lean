@@ -38,10 +38,11 @@ variable {φ φ' φ'' : ℝ → ℝ}
 theorem hasFDerivAt_planeWave (hφ : ∀ s, HasDerivAt φ (φ' s) s) (d : E) (e : F) (x : E) :
     HasFDerivAt (planeWave φ d e) (φ' ⟪d, x⟫ • (innerSL ℝ d).smulRight e) x := by
   have h := ((hφ ⟪d, x⟫).comp_hasFDerivAt x (innerSL ℝ d).hasFDerivAt).smul_const e
-  show HasFDerivAt (fun y => (φ ∘ fun y => innerSL ℝ d y) y • e) _ x
-  convert h using 1
-  ext w
-  simp [smul_smul]
+  have heq : (φ' ⟪d, x⟫ • innerSL ℝ d).smulRight e = φ' ⟪d, x⟫ • (innerSL ℝ d).smulRight e := by
+    ext w
+    simp [smul_smul]
+  rw [← heq]
+  exact h
 
 theorem fderiv_planeWave (hφ : ∀ s, HasDerivAt φ (φ' s) s) (d : E) (e : F) :
     fderiv ℝ (planeWave φ d e) = planeWave φ' d ((innerSL ℝ d).smulRight e) := by
@@ -55,7 +56,11 @@ theorem fderiv_planeWave_apply (hφ : ∀ s, HasDerivAt φ (φ' s) s) (d : E) (e
 
 theorem contDiff_planeWave (hφ : ContDiff ℝ ∞ φ) (d : E) (e : F) :
     ContDiff ℝ ∞ (planeWave φ d e) :=
-  (hφ.comp (contDiff_const.inner contDiff_id)).smul contDiff_const
+  (hφ.comp (ContDiff.inner ℝ contDiff_const contDiff_id)).smul contDiff_const
+
+theorem norm_sq_single {ι : Type*} [Fintype ι] [DecidableEq ι] (i : ι) (k : ℝ) :
+    ‖EuclideanSpace.single i k‖ ^ 2 = k ^ 2 := by
+  rw [PiLp.norm_single, Real.norm_eq_abs, sq_abs]
 
 theorem laplacian_planeWave [FiniteDimensional ℝ E] (hφ : ∀ s, HasDerivAt φ (φ' s) s)
     (hφ' : ∀ s, HasDerivAt φ' (φ'' s) s) (d : E) (e : F) (x : E) :
@@ -67,10 +72,9 @@ theorem laplacian_planeWave [FiniteDimensional ℝ E] (hφ : ∀ s, HasDerivAt �
   simp only [planeWave, ContinuousLinearMap.smul_apply, ContinuousLinearMap.smulRight_apply,
     innerSL_apply_apply, smul_smul, ← Finset.sum_smul]
   congr 1
-  have h := b.sum_inner_mul_inner d d
-  simp only [real_inner_comm (b _) d] at h
-  rw [← real_inner_self_eq_norm_sq, ← h, Finset.sum_mul]
+  rw [← real_inner_self_eq_norm_sq, ← b.sum_inner_mul_inner d d, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
+  rw [real_inner_comm (b i) d]
   ring
 
 end PlaneWave
@@ -140,7 +144,7 @@ theorem laplacian_abc (x : ℝ³) : Δ (abc m A B C) x = -(2 * π * m) ^ 2 • a
   have hs : ∀ s, HasDerivAt sin (cos s) s := hasDerivAt_sin
   have hc : ∀ s, HasDerivAt cos (-sin s) s := hasDerivAt_cos
   have hc' : ∀ s, HasDerivAt (fun s => -sin s) (-cos s) s := fun s => (hasDerivAt_sin s).neg
-  have two : (2 : WithTop ℕ∞) ≤ ∞ := by exact_mod_cast le_top
+  have two : (2 : WithTop ℕ∞) ≤ ∞ := by simp
   have la : ∀ {f₁ f₂ : ℝ³ → ℝ³}, ContDiff ℝ ∞ f₁ → ContDiff ℝ ∞ f₂ →
       Δ (f₁ + f₂) x = Δ f₁ x + Δ f₂ x :=
     fun h₁ h₂ => ContDiffAt.laplacian_add (h₁.contDiffAt.of_le two) (h₂.contDiffAt.of_le two)
@@ -150,14 +154,15 @@ theorem laplacian_abc (x : ℝ³) : Δ (abc m A B C) x = -(2 * π * m) ^ 2 • a
   rw [la _ _, la _ _, la _ _, la _ _, la _ _,
     laplacian_planeWave hs hc, laplacian_planeWave hc hc', laplacian_planeWave hs hc,
     laplacian_planeWave hc hc', laplacian_planeWave hs hc, laplacian_planeWave hc hc']
-  · ext i
+  · simp only [norm_sq_single]
+    ext i
     fin_cases i <;>
-      simp [planeWave, EuclideanSpace.inner_single_left, PiLp.norm_single] <;> ring
+      simp [planeWave, EuclideanSpace.inner_single_left] <;> ring
   all_goals
-    repeat' apply ca
+    repeat' with_reducible apply ca
     all_goals first
-      | exact contDiff_planeWave contDiff_sin _ _
-      | exact contDiff_planeWave contDiff_cos _ _
+      | with_reducible exact contDiff_planeWave contDiff_sin _ _
+      | with_reducible exact contDiff_planeWave contDiff_cos _ _
 
 theorem lamb_abc (x w : ℝ³) :
     ⟪fderiv ℝ (abc m A B C) x (abc m A B C x), w⟫ =
