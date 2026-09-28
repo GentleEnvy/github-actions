@@ -1,0 +1,14 @@
+name = "NavierStokesAB"
+version = "0.1.0"
+defaultTargets = ["NavierStokesAB"]
+
+# The OpenAI formalization of Clay alternatives (C) and (D). It pins the same
+# Lean toolchain and Mathlib revision that this package is checked against.
+[[require]]
+name = "NavierStokesAndEuler"
+git = "https://github.com/openai/NavierStokesAndEuler"
+rev = "f9e8bc5b38b6e212696e8a30e3e91517af887bbd"
+
+[[lean_lib]]
+name = "NavierStokesAB"
+leanOptions = { autoImplicit = false }
