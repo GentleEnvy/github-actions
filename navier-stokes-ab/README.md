@@ -1,9 +1,9 @@
 # Навье–Стокс: варианты (A) и (B) рядом с результатом OpenAI для (C)/(D)
 
-> **Статус:** все файлы компилируются без ошибок. `SmallData/` проверен против настоящих
-> определений `NavierStokes.ComparatorDefinitions` из пакета OpenAI; остальные файлы проверены
-> против копии тех же определений Formal Conjectures. Полная сборка с теоремами OpenAI
-> (Mathlib + их ~2700 файлов) из исходников ещё идёт: кэш Mathlib в этом окружении недоступен.
+> **Статус:** проект полностью собран (`lake build`, 11224 задачи, 0 ошибок) вместе с настоящими
+> теоремами OpenAI `navier_stokes_breakdown_R3/periodic` и `euler_breakdown_R3`.
+> `sorry` нет; все главные теоремы зависят только от стандартных аксиом `propext`,
+> `Classical.choice`, `Quot.sound`.
 
 ## Коротко
 
@@ -128,4 +128,25 @@ Mathlib `85e3a25`.
 
 ## Проверка
 
-_Будет заполнено после полной сборки._
+Сборка из исходников (кэш Mathlib в окружении недоступен), Lean `v4.34.0-rc2`,
+Mathlib `85e3a25`, `openai/NavierStokesAndEuler@f9e8bc5`:
+
+```
+$ lake build NavierStokesAB
+Build completed successfully (11224 jobs).
+```
+
+`#print axioms` для главных результатов:
+
+| теорема | аксиомы |
+|---|---|
+| `clayC`, `clayD` (теоремы OpenAI, реэкспорт) | `propext`, `Classical.choice`, `Quot.sound` |
+| `not_existenceR3_zero` ((A) ложно при `ν = 0`) | `propext`, `Classical.choice`, `Quot.sound` |
+| `existencePeriodic_abc` ((B) для ABC-течений) | `propext`, `Classical.choice`, `Quot.sound` |
+| `clayA_iff_existenceR3_one` (независимость от `ν`) | `propext`, `Classical.choice`, `Quot.sound` |
+| `SmallData.existencePeriodic_of_small` | `propext`, `Classical.choice`, `Quot.sound` |
+| `SmallData.existencePeriodic_of_analytic` | `propext`, `Classical.choice`, `Quot.sound` |
+| `SmallData.existencePeriodic_of_large_viscosity` | `propext`, `Classical.choice`, `Quot.sound` |
+
+Исследовательские заметки о том, почему силу из конструкции OpenAI нельзя убрать:
+[`RESEARCH.md`](RESEARCH.md).
